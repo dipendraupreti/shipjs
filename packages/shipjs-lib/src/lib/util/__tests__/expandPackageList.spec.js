@@ -53,4 +53,18 @@ describe('expandPackageList', () => {
       `${process.cwd()}/sandbox/${projectName}/packages/package_b`,
     ]);
   });
+
+  it('ignore package having "!" in package directory', () => {
+    silentExec('./tests/bootstrap-examples/simple-monorepo.sh');
+
+    expect(
+      expandPackageList(
+        ['.', 'packages/*'],
+        '!packages/package_a'
+      )
+    ).toEqual([
+      `${process.cwd()}/sandbox/simple-monorepo`,
+      `${process.cwd()}/sandbox/simple-monorepo/packages/package_b`,
+    ]);
+  });
 });

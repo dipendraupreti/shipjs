@@ -10,8 +10,19 @@ const hasPackageJson = (dir) => existsSync(`${dir}/package.json`);
 const flatten = (arr) => arr.reduce((acc, item) => acc.concat(item), []);
 
 export default function expandPackageList(list, dir = '.') {
+  const isPackageIgnored = (pkg) => {
+    return expandPackageList(list
+      .filter(value => value.startsWith("!"))
+      .map(item => item.slice(1))
+    ).includes(pkg);
+  }
+
   return flatten(
     list.map((item) => {
+      if (item.startsWith("!")) {
+        return;
+      }
+
       const partIndex = item
         .split(sep)
         .findIndex((part) => part.startsWith('@(') && part.endsWith(')'));
@@ -36,5 +47,5 @@ export default function expandPackageList(list, dir = '.') {
         return resolve(dir, item);
       }
     })
-  ).filter(hasPackageJson);
+  ).filter((pkg) => !isPackageIgnored(pkg)).filter(hasPackageJson);
 }
